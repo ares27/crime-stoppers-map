@@ -1,39 +1,29 @@
-// Data **************************************************************************
-let data = [
-  {
-    ID: 1,
-    Incident: "Dog Poisoning",
-    Incident_Date_Time: "27/11/2024 00:01:00",
-    Address: "31 Flora Road",
-    Lat: -25.806358,
-    Lng: 28.148748,
-  },
-  {
-    ID: 2,
-    Incident: "Dog Poisoning",
-    Incident_Date_Time: "27/11/2024 00:01:00",
-    Address: "29 Flora Road",
-    Lat: -25.806174,
-    Lng: 28.148598,
-  },
-  {
-    ID: 3,
-    Incident: "Dog Poisoning",
-    Incident_Date_Time: "27/11/2024 00:01:00",
-    Address: "32 Flora Road",
-    Lat: -25.806252,
-    Lng: 28.149076,
-  },
-];
-// Data **************************************************************************
 let popup = L.popup();
 let map = L.map("map").setView([-25.806391, 28.148789], 16);
 let osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution:
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-});
-osm.addTo(map);
+}).addTo(map);
+
+let Stadia_AlidadeSatellite = L.tileLayer(
+  "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}",
+  {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution:
+      '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    ext: "jpg",
+  }
+);
+
+let basemaps = {
+  "Open Street Map": osm,
+  "Satellite Map": Stadia_AlidadeSatellite,
+};
+
+L.Control.geocoder().addTo(map);
+L.control.layers(basemaps).addTo(map);
 
 function onMapClick(e) {
   popup
@@ -43,9 +33,7 @@ function onMapClick(e) {
 }
 map.on("click", onMapClick);
 
-// Reverse geolocation: get street address from latlon
-
-// Show data point on map
+// Show data points on map
 data.forEach(function (item) {
   console.log(item);
   L.circle([item.Lat, item.Lng], {
@@ -56,6 +44,7 @@ data.forEach(function (item) {
   }).addTo(map).bindPopup(`
       <b>Incident:</b>☠️ ${item.Incident}</br>
       <b>Reported Date:</b> ${item.Incident_Date_Time}</br>
-      <b>Address:</b> ${item.Address}
+      <b>Address:</b> ${item.Address}</br>
+      <b>Comment:</b> ${item.Comment}
       `);
 });
