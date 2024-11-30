@@ -17,9 +17,20 @@ let Stadia_AlidadeSatellite = L.tileLayer(
   }
 );
 
+let Esri_WorldImagery = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution:
+      "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+  }
+);
+
 let basemaps = {
   "Open Street Map": osm,
   "Satellite Map": Stadia_AlidadeSatellite,
+  "World Imagery": Esri_WorldImagery,
 };
 
 L.Control.geocoder().addTo(map);
