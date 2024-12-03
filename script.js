@@ -1,49 +1,22 @@
 let markerColor;
 let map = L.map("map").setView([-25.806391, 28.148789], 16);
 let popup = L.popup();
-let Incident_Data = L.geoJSON(IncidentData, {
-  pointToLayer: function (feature, latlng) {
-    let { Incident } = feature.properties;
-    switch (Incident) {
-      case "Dog Poisoning":
-        markerColor = "#ba0ff9";
-        break;
-      case "Burglary":
-        markerColor = "#fa9346";
-    }
-
-    return L.circleMarker(latlng, {
-      color: markerColor,
-      fillColor: markerColor,
-      fillOpacity: 1,
-      radius: 5,
-    });
-  },
-})
-  .addTo(map)
-  .bindPopup((layer) => {
-    const { Incident, Incident_Date_Time, Address, Comment, emoji } =
-      layer.feature.properties;
-    return `
-    <b>Incident: </b>${emoji} ${Incident}</br>
-    <b>IncidentDate: </b>${Incident_Date_Time}</br>
-    <b>Address: </b>${Address}</br>
-    <b>Comment: </b>${Comment}</br>
-    `;
-  });
+const apiKey =
+  "AAPK38d5964a655b48dbb8fb30fe5bc1098co28bAFzHHonjZPlh5QIp2DRruOGyamDWbvQJegvAQlvfxlKs94COtvB-ad44WdjI";
 
 let osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution:
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
+
 let Esri_WorldImagery = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {
     minZoom: 0,
     maxZoom: 20,
     attribution:
-      "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+      "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
   }
 );
 
@@ -52,12 +25,56 @@ let basemaps = {
   "World Imagery": Esri_WorldImagery,
 };
 
-let overlayMaps = {
-  "Incident Data": Incident_Data,
-};
+let overlayMaps = {};
 
-L.Control.geocoder().addTo(map);
-L.control.layers(basemaps, overlayMaps).addTo(map);
+// L.Control.geocoder().addTo(map);
+const searchControl = L.esri.Geocoding.geosearch({
+  position: "topright",
+  useMapBounds: false,
+  providers: [
+    L.esri.Geocoding.arcgisOnlineProvider({
+      apikey: apiKey,
+    }),
+  ],
+}).addTo(map);
+
+const results = L.layerGroup().addTo(map);
+
+searchControl.on("results", function (data) {
+  results.clearLayers();
+  for (let i = data.results.length - 1; i >= 0; i--) {
+    console.log(data.results[i]);
+    results.addLayer(
+      L.marker(data.results[i].latlng).bindPopup(
+        `
+        ${data.results[i].latlng}</br>
+        Address:  ${data.results[i].properties.Match_addr}</br>
+        <hr>
+        <form id="form">
+          <label for="incidents">Incident:</label></br>
+            <select name="incidents" id="incidents">
+              <option value="burglary">Burglary</option>
+              <option value="dogpoisoning">Dog Poisoning</option>
+              <option value="other">Other</option>
+            </select></br>
+          <label for="comments">Comments:</label></br>
+          <textarea id="comments" name="comments" rows="2" cols="20"></textarea></br>
+          <input type="submit" value="Submit">
+        </form> 
+        `
+      )
+    );
+    console.log(data.results[i].latlng);
+  }
+});
+
+document.addEventListener("dataReady", function (event) {
+  let Incident_Data = event.detail.Incident_Data;
+
+  overlayMaps["Incident Data"] = Incident_Data;
+
+  L.control.layers(basemaps, overlayMaps).addTo(map);
+});
 
 function onMapClick(e) {
   popup
@@ -66,19 +83,3 @@ function onMapClick(e) {
     .openOn(map);
 }
 map.on("click", onMapClick);
-
-// Show data points on map
-// IncidentData.forEach(function (item) {
-//   console.log(item);
-//   L.circle([item.Lat, item.Lng], {
-//     color: "red",
-//     fillColor: "#f03",
-//     fillOpacity: 1,
-//     radius: 5,
-//   }).addTo(map).bindPopup(`
-//       <b>Incident:</b>☠️ ${item.Incident}</br>
-//       <b>Reported Date:</b> ${item.Incident_Date_Time}</br>
-//       <b>Address:</b> ${item.Address}</br>
-//       <b>Comment:</b> ${item.Comment}
-//       `);
-// });
