@@ -49,18 +49,6 @@ searchControl.on("results", function (data) {
         `
         ${data.results[i].latlng}</br>
         Address:  ${data.results[i].properties.Match_addr}</br>
-        <hr>
-        <form id="form">
-          <label for="incidents">Incident:</label></br>
-            <select name="incidents" id="incidents">
-              <option value="burglary">Burglary</option>
-              <option value="dogpoisoning">Dog Poisoning</option>
-              <option value="other">Other</option>
-            </select></br>
-          <label for="comments">Comments:</label></br>
-          <textarea id="comments" name="comments" rows="2" cols="20"></textarea></br>
-          <input type="submit" value="Submit">
-        </form> 
         `
       )
     );
