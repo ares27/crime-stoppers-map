@@ -61,7 +61,11 @@ document.addEventListener("dataReady", function (event) {
 
   overlayMaps["Incident Data"] = Incident_Data;
 
-  L.control.layers(basemaps, overlayMaps).addTo(map);
+  L.control
+    .layers(basemaps, overlayMaps, {
+      position: "topleft",
+    })
+    .addTo(map);
 });
 
 function onMapClick(e) {

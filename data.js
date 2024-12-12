@@ -22,6 +22,7 @@ async function getData() {
           Incident: incident.Incident,
           Incident_Date_Time: incident.IncidentDateTime,
           Address: incident.Address,
+          ImageURL: incident.ImageURL,
           Comment: incident.Comment,
           emoji: incident.Emoji,
         },
@@ -42,6 +43,7 @@ async function getData() {
 function initializeMap() {
   let Incident_Data = L.geoJSON(IncidentData, {
     pointToLayer: function (feature, latlng) {
+      // console.log(feature.properties);
       let { Incident } = feature.properties;
       let markerColor;
       switch (Incident) {
@@ -65,13 +67,20 @@ function initializeMap() {
   })
     .addTo(map)
     .bindPopup((layer) => {
-      const { Incident, Incident_Date_Time, Address, Comment, emoji } =
-        layer.feature.properties;
+      const {
+        Incident,
+        Incident_Date_Time,
+        Address,
+        ImageURL,
+        Comment,
+        emoji,
+      } = layer.feature.properties;
       return `
       <b>Incident: </b>${emoji} ${Incident}</br>
       <b>IncidentDate: </b>${Incident_Date_Time}</br>
       <b>Address: </b>${Address}</br>
       <b>Comment: </b>${Comment}</br>
+      <b>Image: </b><img src=${ImageURL}></br>
       `;
     });
 
