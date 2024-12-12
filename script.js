@@ -1,8 +1,49 @@
 let markerColor;
-let map = L.map("map").setView([-25.806391, 28.148789], 16);
+var options = {
+  center: new L.LatLng(-25.806391, 28.148789),
+  zoom: 16,
+  messagebox: true,
+};
+// let map = L.map("map").setView([-25.806391, 28.148789], 16);
+let map = L.map("map", options);
 let popup = L.popup();
 const apiKey =
   "AAPK38d5964a655b48dbb8fb30fe5bc1098co28bAFzHHonjZPlh5QIp2DRruOGyamDWbvQJegvAQlvfxlKs94COtvB-ad44WdjI";
+const sidepanelLeft = L.control
+  .sidepanel("mySidepanelLeft", {
+    tabsPosition: "left",
+    startTab: "tab-5",
+  })
+  .addTo(map);
+
+// var messages = [
+//   "Lorum ipsum",
+//   'Buy me a beer <img src="https://www.grendelman.net/wp/wp-includes/images/smilies/icon_smile.gif" />',
+//   "Let me google that for you",
+//   "Multi-line<br />messages<br />are also<br />possible",
+// ];
+var messages = [
+  "Lorum ipsum",
+  "Multi-line<br />Lorum ipsum<br />Lorum ipsum<br />Lorum ipsum",
+];
+// var positions = ["topleft", "topright", "bottomleft", "bottomright"];
+var positions = ["bottomright"];
+
+L.control.liveupdate({
+  update_map: function () {
+    var i = Math.floor(Math.random() * messages.length);
+    var msg = messages[i];
+    var j = Math.floor(Math.random() * positions.length);
+    var pos = positions[j];
+    map.messagebox.setPosition(pos);
+    map.messagebox.options.timeout = 6000;
+    map.messagebox.show(msg);
+  },
+  position: "topleft",
+  interval: 5000,
+});
+// .addTo(map)
+// .startUpdating();
 
 let osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
