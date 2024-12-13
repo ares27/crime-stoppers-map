@@ -80,7 +80,6 @@ const searchControl = L.esri.Geocoding.geosearch({
 }).addTo(map);
 
 const results = L.layerGroup().addTo(map);
-
 searchControl.on("results", function (data) {
   results.clearLayers();
   for (let i = data.results.length - 1; i >= 0; i--) {
@@ -99,8 +98,10 @@ searchControl.on("results", function (data) {
 
 document.addEventListener("dataReady", function (event) {
   let Incident_Data = event.detail.Incident_Data;
+  let PowerFailure_Data = event.detail.PowerFailure_Data;
 
-  overlayMaps["Incident Data"] = Incident_Data;
+  overlayMaps["Incidents"] = Incident_Data;
+  overlayMaps["Power Failures"] = PowerFailure_Data;
 
   L.control
     .layers(basemaps, overlayMaps, {
@@ -108,6 +109,38 @@ document.addEventListener("dataReady", function (event) {
     })
     .addTo(map);
 });
+
+// let l_data = {
+//   type: "FeatureCollection",
+//   features: [
+//     {
+//       type: "Feature",
+//       properties: {
+//         name: "Theo Street, Centurion, City of Tshwane, Gauteng, 0157",
+//       },
+//       geometry: {
+//         coordinates: [
+//           [28.136126650755386, -25.853133680186644],
+//           [28.14750994581493, -25.850932311024863],
+//         ],
+//         type: "LineString",
+//       },
+//     },
+//   ],
+// };
+
+// L.geoJSON(l_data, {
+// style: function (feature) {
+//   return {
+//     color: "red",
+//     // weight: 1,
+//   };
+// },
+// })
+// .bindPopup(function (layer) {
+//   return `${layer.feature.properties.name}`;
+// })
+// .addTo(map);
 
 function onMapClick(e) {
   popup

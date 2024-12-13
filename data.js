@@ -3,7 +3,12 @@ let IncidentData = {
   features: null,
 };
 
-async function getData() {
+let PowerFailureData = {
+  type: "FeatureCollection",
+  features: null,
+};
+
+async function getIncidentData() {
   const sheetId = "1xoWNqUkRiXsnRTepu_-gd1LacaNl0f-uV8Qn4lRJJrQ";
   const tabId = 1;
   let url = `https://opensheet.elk.sh/${sheetId}/${tabId}`;
@@ -11,6 +16,8 @@ async function getData() {
   try {
     const response = await fetch(url);
     const data = await response.json();
+    // console.log("incident data");
+    // console.log(data);
 
     // Transform the data to match the desired schema
     IncidentData.features = data.map((incident) => {
@@ -34,7 +41,45 @@ async function getData() {
     });
 
     // Initialize the map and add the geoJSON layer
-    initializeMap();
+    // initializeMap();
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+async function getPowerFailureData() {
+  const sheetId = "1xoWNqUkRiXsnRTepu_-gd1LacaNl0f-uV8Qn4lRJJrQ";
+  const tabId = 2;
+  let url = `https://opensheet.elk.sh/${sheetId}/${tabId}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    // console.log("power data");
+    // console.log(data);
+
+    // Transform the data to match the desired schema
+    PowerFailureData.features = data
+      .filter((line) => line.Coords !== undefined) // Filter out undefined Coords
+      .map((line) => {
+        // Remove the outer quotes and parse the coordinates
+        const coordinates = line.Coords.replace(/^\[|\]$/g, "") // Remove the outer brackets
+          .split("],[") // Split into individual coordinate pairs
+          .map((coord) => coord.split(",").map(Number)); // Parse each pair
+
+        return {
+          type: "Feature",
+          properties: {
+            street: line.Street,
+            suburb: line.Suburb,
+            reported: line.Reported,
+          },
+          geometry: {
+            type: "LineString",
+            coordinates: coordinates,
+          },
+        };
+      });
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -84,11 +129,54 @@ function initializeMap() {
       `;
     });
 
+  // console.log("PowerFailureData");
+  // console.log(PowerFailureData);
+
+  // Add the PowerFailureData layer
+  let PowerFailure_Data = L.geoJSON(PowerFailureData, {
+    style: function (feature) {
+      // Customize the style for line features
+      return { color: "red", weight: 2 };
+    },
+  })
+    .addTo(map)
+    .bindPopup((layer) => {
+      // console.log(layer);
+
+      // Customize the popup content for line features
+      return `
+        Category: Power Failure</br>
+        Street: ${layer.feature.properties.street}</br>
+        Suburb: ${layer.feature.properties.suburb}
+        `;
+    });
+
   // Dispatch a custom event to signal that the data is ready
   document.dispatchEvent(
-    new CustomEvent("dataReady", { detail: { Incident_Data } })
+    new CustomEvent("dataReady", {
+      detail: { Incident_Data, PowerFailure_Data },
+    })
   );
 }
 
 // Call the function to fetch and log the data
-getData();
+// getIncidentData();
+
+// getPowerFailureData();
+
+// Initialize counters for datasets
+let datasetsReady = 0;
+
+// Function to check if both datasets are ready
+function checkDatasetsReady() {
+  datasetsReady++;
+  if (datasetsReady === 2) {
+    initializeMap();
+  }
+}
+
+// Call getIncidentData and check if it's ready
+getIncidentData().then(checkDatasetsReady);
+
+// Call getPowerFailureData and check if it's ready
+getPowerFailureData().then(checkDatasetsReady);
