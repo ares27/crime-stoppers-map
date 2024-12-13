@@ -139,7 +139,7 @@ function initializeMap() {
       return { color: "red", weight: 2 };
     },
   })
-    .addTo(map)
+    // .addTo(map)
     .bindPopup((layer) => {
       // console.log(layer);
 
