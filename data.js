@@ -92,14 +92,29 @@ function initializeMap() {
       let { Incident } = feature.properties;
       let markerColor;
       switch (Incident) {
-        case "Dog Poisoning":
-          markerColor = "#ba0ff9";
-          break;
         case "Burglary":
           markerColor = "#fa9346";
           break;
+        case "Dog Poisoning":
+          markerColor = "#ba0ff9";
+          break;
+        case "Firearm Offence":
+          markerColor = "#d85109";
+          break;
+        case "Robbery/Armed Robbery":
+          markerColor = "#d85109";
+          break;
+        case "Kidnapping/Missing Person":
+          markerColor = "#900C3F";
+          break;
+        case "Robbery/Armed Robbery":
+          markerColor = "#d85109";
+          break;
+        case "Theft":
+          markerColor = "#fa9346";
+          break;
         default:
-          markerColor = "#3388ff"; // Default marker color
+          markerColor = "#8f9ea7"; // Default marker color
       }
 
       return L.circleMarker(latlng, {

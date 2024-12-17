@@ -61,9 +61,40 @@ let Esri_WorldImagery = L.tileLayer(
   }
 );
 
+var Stadia_AlidadeSatellite = L.tileLayer(
+  "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}",
+  {
+    minZoom: 0,
+    maxZoom: 20,
+    attribution:
+      '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    ext: "jpg",
+  }
+);
+
+let googleStreets = L.tileLayer(
+  "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+  {
+    maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  }
+);
+
+let googleTraffic = L.tileLayer(
+  "https://{s}.google.com/vt/lyrs=m@221097413,traffic&x={x}&y={y}&z={z}",
+  {
+    maxZoom: 20,
+    minZoom: 2,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  }
+);
+
 let basemaps = {
   "Open Street Map": osm,
   "World Imagery": Esri_WorldImagery,
+  Satellite: Stadia_AlidadeSatellite,
+  // "Google Streets": googleStreets,
+  // "Google Traffic": googleTraffic,
 };
 
 let overlayMaps = {};
@@ -141,6 +172,31 @@ document.addEventListener("dataReady", function (event) {
 //   return `${layer.feature.properties.name}`;
 // })
 // .addTo(map);
+
+/*Legend specific*/
+var legend = L.control({ position: "bottomleft" });
+
+legend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "legend");
+  div.innerHTML += "<h4>Incidents</h4>";
+  div.innerHTML +=
+    '<i style="background: #fa9346; border-radius:50%"></i><span>Burglary</span><br>';
+  div.innerHTML +=
+    '<i style="background: #ba0ff9;border-radius:50%"></i><span>Dog Poisoning</span><br>';
+  div.innerHTML +=
+    '<i style="background: #d85109;border-radius:50%"></i><span>Firearm Offence</span><br>';
+  div.innerHTML +=
+    '<i style="background: #900C3F;border-radius:50%"></i><span>Kidnapping/Missing Person</span><br>';
+  div.innerHTML +=
+    '<i style="background: #d85109;border-radius:50%"></i><span>Robbery/Armed Robbery</span><br>';
+  div.innerHTML +=
+    '<i style="background: #fa9346;border-radius:50%"></i><span>Theft</span><br>';
+  div.innerHTML +=
+    '<i style="background: #8f9ea7;border-radius:50%"></i><span>Other</span><br>';
+  return div;
+};
+
+legend.addTo(map);
 
 function onMapClick(e) {
   popup
