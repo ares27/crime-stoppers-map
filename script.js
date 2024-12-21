@@ -1,11 +1,11 @@
 let markerColor;
-var options = {
+let mapOptions = {
   center: new L.LatLng(-25.806391, 28.148789),
   zoom: 16,
   messagebox: true,
 };
 // let map = L.map("map").setView([-25.806391, 28.148789], 16);
-let map = L.map("map", options);
+let map = L.map("map", mapOptions);
 let popup = L.popup();
 const apiKey =
   "AAPK38d5964a655b48dbb8fb30fe5bc1098co28bAFzHHonjZPlh5QIp2DRruOGyamDWbvQJegvAQlvfxlKs94COtvB-ad44WdjI";
@@ -29,6 +29,7 @@ var messages = [
 // var positions = ["topleft", "topright", "bottomleft", "bottomright"];
 var positions = ["bottomright"];
 
+/* Live update for message box popups  */
 L.control.liveupdate({
   update_map: function () {
     var i = Math.floor(Math.random() * messages.length);
@@ -51,7 +52,7 @@ let osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
-let Esri_WorldImagery = L.tileLayer(
+const Esri_WorldImagery = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {
     minZoom: 0,
@@ -61,7 +62,7 @@ let Esri_WorldImagery = L.tileLayer(
   }
 );
 
-var Stadia_AlidadeSatellite = L.tileLayer(
+const Stadia_AlidadeSatellite = L.tileLayer(
   "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}",
   {
     minZoom: 0,
@@ -72,7 +73,7 @@ var Stadia_AlidadeSatellite = L.tileLayer(
   }
 );
 
-let googleStreets = L.tileLayer(
+const googleStreets = L.tileLayer(
   "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
   {
     maxZoom: 20,
@@ -80,7 +81,7 @@ let googleStreets = L.tileLayer(
   }
 );
 
-let googleTraffic = L.tileLayer(
+const googleTraffic = L.tileLayer(
   "https://{s}.google.com/vt/lyrs=m@221097413,traffic&x={x}&y={y}&z={z}",
   {
     maxZoom: 20,
@@ -96,10 +97,9 @@ let basemaps = {
   // "Google Streets": googleStreets,
   // "Google Traffic": googleTraffic,
 };
-
 let overlayMaps = {};
 
-// L.Control.geocoder().addTo(map);
+/* Search with Geolocate  */
 const searchControl = L.esri.Geocoding.geosearch({
   position: "topright",
   useMapBounds: false,
@@ -141,43 +141,10 @@ document.addEventListener("dataReady", function (event) {
     .addTo(map);
 });
 
-// let l_data = {
-//   type: "FeatureCollection",
-//   features: [
-//     {
-//       type: "Feature",
-//       properties: {
-//         name: "Theo Street, Centurion, City of Tshwane, Gauteng, 0157",
-//       },
-//       geometry: {
-//         coordinates: [
-//           [28.136126650755386, -25.853133680186644],
-//           [28.14750994581493, -25.850932311024863],
-//         ],
-//         type: "LineString",
-//       },
-//     },
-//   ],
-// };
-
-// L.geoJSON(l_data, {
-// style: function (feature) {
-//   return {
-//     color: "red",
-//     // weight: 1,
-//   };
-// },
-// })
-// .bindPopup(function (layer) {
-//   return `${layer.feature.properties.name}`;
-// })
-// .addTo(map);
-
-/*Legend specific*/
-var legend = L.control({ position: "bottomleft" });
-
+/* Legend */
+let legend = L.control({ position: "bottomleft" });
 legend.onAdd = function (map) {
-  var div = L.DomUtil.create("div", "legend");
+  let div = L.DomUtil.create("div", "legend");
   div.innerHTML += "<h4>Incidents</h4>";
   div.innerHTML +=
     '<i style="background: #fa9346; border-radius:50%"></i><span>Burglary</span><br>';
@@ -195,8 +162,13 @@ legend.onAdd = function (map) {
     '<i style="background: #8f9ea7;border-radius:50%"></i><span>Other</span><br>';
   return div;
 };
-
 legend.addTo(map);
+
+/* Pulsing icon */
+// let pulsingIcon = L.icon.pulse({ iconSize: [10, 10], color: "red" });
+// let marker = L.marker([-25.806391, 28.148789], { icon: pulsingIcon }).addTo(
+//   map
+// );
 
 function onMapClick(e) {
   popup

@@ -48,21 +48,29 @@ async function getIncidentData() {
 }
 
 async function getPowerFailureData() {
-  const sheetId = "1xoWNqUkRiXsnRTepu_-gd1LacaNl0f-uV8Qn4lRJJrQ";
-  const tabId = 2;
+  // const sheetId = "1xoWNqUkRiXsnRTepu_-gd1LacaNl0f-uV8Qn4lRJJrQ";
+  // const tabId = 2;
+  const sheetId = "1ENeCkhX3EHlQHY7Q6MhQBiAWriAXVVePR9rn9XCVTFY";
+  const tabId = 1;
   let url = `https://opensheet.elk.sh/${sheetId}/${tabId}`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
-    // console.log("power data");
-    // console.log(data);
+    console.log(data);
 
     // Transform the data to match the desired schema
     PowerFailureData.features = data
-      .filter((line) => line.Coords !== undefined) // Filter out undefined Coords
+      .filter(
+        (line) =>
+          (line.Coords !== undefined || line.Coords !== "") &&
+          line.Status == "Open"
+      ) // Filter out undefined Coords
+      // .filter((line) => line.Coords !== "") // Filter out blank Coords
+      // .filter((line) => line.Status == "Open") // Filter for Open Coords
       .map((line) => {
         // Remove the outer quotes and parse the coordinates
+        console.log(line);
         const coordinates = line.Coords.replace(/^\[|\]$/g, "") // Remove the outer brackets
           .split("],[") // Split into individual coordinate pairs
           .map((coord) => coord.split(",").map(Number)); // Parse each pair
@@ -144,9 +152,6 @@ function initializeMap() {
       `;
     });
 
-  // console.log("PowerFailureData");
-  // console.log(PowerFailureData);
-
   // Add the PowerFailureData layer
   let PowerFailure_Data = L.geoJSON(PowerFailureData, {
     style: function (feature) {
@@ -156,9 +161,6 @@ function initializeMap() {
   })
     // .addTo(map)
     .bindPopup((layer) => {
-      // console.log(layer);
-
-      // Customize the popup content for line features
       return `
         Category: Power Failure</br>
         Street: ${layer.feature.properties.street}</br>
@@ -173,11 +175,6 @@ function initializeMap() {
     })
   );
 }
-
-// Call the function to fetch and log the data
-// getIncidentData();
-
-// getPowerFailureData();
 
 // Initialize counters for datasets
 let datasetsReady = 0;
